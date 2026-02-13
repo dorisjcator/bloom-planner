@@ -310,12 +310,24 @@ function rBud(){
       h+='<button onclick="tPd(\''+ln.id+'\')" style="width:16px;height:16px;border-radius:4px;border:2px solid '+(isPd?bc.c:'#e2c0d4')+';background:'+(isPd?bc.c:'#fff')+';cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:8px;padding:0">'+(isPd?'\u2713':'')+'</button>';
       // Label
       h+='<span style="font-size:11px;flex:1;min-width:50px;'+(isPd?'text-decoration:line-through':'')+'">'+es(ln.l)+'</span>';
-      // Editable plan
-      h+='<span style="font-size:9px;color:#b89aac">plan:</span>';
-      h+='<input type="number" value="'+(ln.a||'')+'" onchange="uF(\''+ln.id+'\',\'a\',this.value)" style="width:55px;padding:2px 4px;border-radius:4px;border:1px solid #d4c0f5;font-size:10px;outline:none;color:#6b2158;text-align:right;font-weight:700">';
-      // Editable spent
-      h+='<span style="font-size:9px;color:#b89aac;margin-left:3px">spent:</span>';
-      h+='<input type="number" value="'+(ln.sp||'')+'" onchange="uF(\''+ln.id+'\',\'sp\',this.value)" style="width:55px;padding:2px 4px;border-radius:4px;border:1px solid #f5d0e6;font-size:10px;outline:none;color:#4a2040;text-align:right">';
+      // Editable plan (show as subtle if zero for debt)
+      var planVal=parseFloat(ln.a)||0;
+      if(bc.hasBal&&planVal===0){
+        h+='<span style="font-size:9px;color:#b89aac">plan:</span>';
+        h+='<input type="number" value="'+(ln.a||'')+'" onchange="uF(\''+ln.id+'\',\'a\',this.value)" placeholder="0" style="width:45px;padding:2px 4px;border-radius:4px;border:1px dashed #e2c0d4;font-size:10px;outline:none;color:#b89aac;text-align:right">';
+      } else {
+        h+='<span style="font-size:9px;color:#b89aac">plan:</span>';
+        h+='<input type="number" value="'+(ln.a||'')+'" onchange="uF(\''+ln.id+'\',\'a\',this.value)" style="width:55px;padding:2px 4px;border-radius:4px;border:1px solid #d4c0f5;font-size:10px;outline:none;color:#6b2158;text-align:right;font-weight:700">';
+      }
+      // Editable spent (hide if no plan for debt-only tracking)
+      if(!bc.hasBal||planVal>0){
+        h+='<span style="font-size:9px;color:#b89aac;margin-left:3px">spent:</span>';
+        h+='<input type="number" value="'+(ln.sp||'')+'" onchange="uF(\''+ln.id+'\',\'sp\',this.value)" style="width:55px;padding:2px 4px;border-radius:4px;border:1px solid #f5d0e6;font-size:10px;outline:none;color:#4a2040;text-align:right">';
+      } else {
+        // For debt with $0 plan, still allow spent but make it optional looking
+        h+='<span style="font-size:9px;color:#b89aac;margin-left:3px">paid:</span>';
+        h+='<input type="number" value="'+(ln.sp||'')+'" onchange="uF(\''+ln.id+'\',\'sp\',this.value)" placeholder="0" style="width:55px;padding:2px 4px;border-radius:4px;border:1px dashed #bbf7d0;font-size:10px;outline:none;color:#059669;text-align:right">';
+      }
       // Balance for debt
       if(bc.hasBal){
         h+='<span style="font-size:9px;color:#dc2626;margin-left:3px">bal:</span>';
@@ -370,12 +382,21 @@ window.aI=function(){
   B.push({id:uid(),mo:bKey(),tp:'i',l:l,a:a});D();tt('\uD83D\uDCB0 Income added!');
 };
 window.aBL=function(bc2){
-  var l=document.getElementById('bl_'+bc2).value,a=document.getElementById('ba_'+bc2).value;
-  if(!a||parseFloat(a)<=0) return;
-  var found=null;for(var i=0;i<BC.length;i++){if(BC[i].k===bc2){found=BC[i];break}}
-  var item={id:uid(),mo:bKey(),tp:'e',bc:bc2,l:l||(found?found.l:''),a:a};
+  var l=document.getElementById('bl_'+bc2).value;
+  var a=document.getElementById('ba_'+bc2).value;
   var balEl=document.getElementById('bb_'+bc2);
-  if(balEl&&balEl.value) item.bal=balEl.value;
+  var bal=balEl?balEl.value:'';
+  // For debt, allow adding with just a balance (no plan required)
+  var hasBal2=false;
+  for(var i=0;i<BC.length;i++){if(BC[i].k===bc2&&BC[i].hasBal){hasBal2=true;break}}
+  if(hasBal2){
+    if((!a||parseFloat(a)<=0)&&(!bal||parseFloat(bal)<=0)) return;
+  } else {
+    if(!a||parseFloat(a)<=0) return;
+  }
+  var found=null;for(var i2=0;i2<BC.length;i2++){if(BC[i2].k===bc2){found=BC[i2];break}}
+  var item={id:uid(),mo:bKey(),tp:'e',bc:bc2,l:l||(found?found.l:''),a:a||'0'};
+  if(bal) item.bal=bal;
   B.push(item);D();tt('\uD83C\uDF38 Line added!');
 };
 window.dB=function(id){B=B.filter(function(b){return b.id!==id});D();tt('\u2715 Removed','error')};
