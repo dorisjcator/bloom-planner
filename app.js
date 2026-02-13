@@ -431,7 +431,16 @@ function rCal(){
     h+='<div class="nmc"><span>'+d+'</span>';
     if(de.length) h+='<span class="ccnt">'+de.length+'</span>';
     h+='</div>';
-    for(var n=0;n<Math.min(de.length,2);n++){var c2=C[de[n].cat]||C.appt;h+='<div class="mic" style="background:'+c2.b+';color:'+c2.c+'">'+es(de[n].t)+'</div>'}
+    for(var n=0;n<Math.min(de.length,2);n++){
+      var c2=C[de[n].cat]||C.appt;
+      var dayLabel=es(de[n].t);
+      if(de[n].d2){
+        if(ds===de[n].d) dayLabel='\u25B6 '+dayLabel;
+        else if(ds===de[n].d2) dayLabel=dayLabel+' \u25C0';
+        else dayLabel='\u2500 '+dayLabel;
+      }
+      h+='<div class="mic" style="background:'+c2.b+';color:'+c2.c+'">'+dayLabel+'</div>';
+    }
     if(de.length>2) h+='<div style="font-size:7px;color:#b89aac">+'+(de.length-2)+'</div>';
     h+='</div>';
   }
@@ -447,7 +456,14 @@ function rCal(){
   }
   h+='</div>';el.innerHTML=h;
 }
-function dE(ds){return E.filter(function(e){return e.d===ds})}
+function dE(ds){
+  return E.filter(function(e){
+    if(e.d===ds) return true;
+    // Show on all days between start and end date
+    if(e.d2 && ds>e.d && ds<=e.d2) return true;
+    return false;
+  });
+}
 window.cP=function(){if(Q.cm===0){Q.cm=11;Q.cy--}else Q.cm--;Q.ed=null;D()};
 window.cN=function(){if(Q.cm===11){Q.cm=0;Q.cy++}else Q.cm++;Q.ed=null;D()};
 window.tD=function(ds){Q.ed=Q.ed===ds?null:ds;D()};
