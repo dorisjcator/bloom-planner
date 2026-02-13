@@ -252,7 +252,7 @@ function rBud(){
     h+='<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #fce7f3">';
     h+='<span style="font-size:12px">'+es(ic2.l)+'</span>';
     h+='<span style="display:flex;gap:6px;align-items:center">';
-    h+='<strong style="color:#059669;font-size:12px">$'+parseFloat(ic2.a).toFixed(0)+'</strong>';
+    h+='<input type="number" value="'+(ic2.a||'')+'" onchange="uInc(\''+ic2.id+'\',this.value)" style="width:70px;padding:2px 4px;border-radius:4px;border:1px solid #bbf7d0;font-size:11px;outline:none;color:#059669;text-align:right;font-weight:700">';
     h+='<button class="abt dl" style="font-size:9px;padding:1px 4px" onclick="dB(\''+ic2.id+'\')">\u2715</button>';
     h+='</span></div>';
   }
@@ -306,7 +306,8 @@ function rBud(){
       h+='<div style="display:flex;align-items:center;padding:5px 4px;border-bottom:1px solid #fce7f3;gap:5px;opacity:'+(isPd?'.55':'1')+';flex-wrap:wrap">';
       h+='<button onclick="tPd(\''+ln.id+'\')" style="width:16px;height:16px;border-radius:4px;border:2px solid '+(isPd?bc.c:'#e2c0d4')+';background:'+(isPd?bc.c:'#fff')+';cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:8px;padding:0">'+(isPd?'\u2713':'')+'</button>';
       h+='<span style="font-size:11px;flex:1;min-width:50px;'+(isPd?'text-decoration:line-through':'')+'">'+es(ln.l)+'</span>';
-      h+='<span style="font-size:9px;color:#b89aac">plan:</span><strong style="font-size:11px">$'+parseFloat(ln.a).toFixed(0)+'</strong>';
+      h+='<span style="font-size:9px;color:#b89aac">plan:</span>';
+      h+='<input type="number" value="'+(ln.a||'')+'" onchange="uPl(\''+ln.id+'\',this.value)" style="width:55px;padding:2px 4px;border-radius:4px;border:1px solid #d4c0f5;font-size:10px;outline:none;color:#6b2158;text-align:right;font-weight:700">';
       h+='<span style="font-size:9px;color:#b89aac;margin-left:3px">spent:</span>';
       h+='<input type="number" value="'+(ln.sp||'')+'" onchange="uSp(\''+ln.id+'\',this.value)" style="width:55px;padding:2px 4px;border-radius:4px;border:1px solid #f5d0e6;font-size:10px;outline:none;color:#4a2040;text-align:right">';
       if(bc.hasBal){
@@ -392,11 +393,19 @@ window.tPd=function(id){
 };
 
 window.uSp=function(id,val){
-  for(var i=0;i<B.length;i++){if(B[i].id===id){B[i].sp=val;sv();return}}
+  for(var i=0;i<B.length;i++){if(B[i].id===id){B[i].sp=val;sv();D();return}}
 };
 
 window.uBal=function(id,val){
-  for(var i=0;i<B.length;i++){if(B[i].id===id){B[i].bal=val;sv();return}}
+  for(var i=0;i<B.length;i++){if(B[i].id===id){B[i].bal=val;sv();D();return}}
+};
+
+window.uPl=function(id,val){
+  for(var i=0;i<B.length;i++){if(B[i].id===id){B[i].a=val;sv();D();return}}
+};
+
+window.uInc=function(id,val){
+  for(var i=0;i<B.length;i++){if(B[i].id===id){B[i].a=val;sv();D();return}}
 };
 
 window.cpL=function(){
